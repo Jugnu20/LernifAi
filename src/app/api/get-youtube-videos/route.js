@@ -1,5 +1,5 @@
 // src/app/api/get-youtube-videos/route.js
-import { fetchYouTubeVideos } from '@/src/utils/fetchYoutubeVideos';
+import { fetchYouTubeVideos } from '@/utils/fetchVideoLinks';
 
 export async function POST(req) {
   const { subtopics } = await req.json();
