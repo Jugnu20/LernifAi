@@ -1,6 +1,9 @@
 'use client';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession, signIn, signOut } from 'next-auth/react';
+import { UserDashboard } from '@/components/UserDashboard';
 
 // Loader spinner component
 function Loader() {
@@ -16,6 +19,7 @@ export default function Home() {
   const [parts, setParts] = useState(3);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,22 +40,52 @@ export default function Home() {
         .filter(line => /^[0-9]/.test(line))
         .map(line => line.replace(/^[0-9.]+\s*/, ''));
 
-      // Redirect to /learn/[slug]
       router.push(`/learn/${encodeURIComponent(cleaned.join('|||'))}`);
     } catch (error) {
       console.error('Error generating subtopics:', error);
+    } finally {
       setIsLoading(false);
     }
   };
+  <UserDashboard/>
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white p-6 relative">
+      {/* Dashboard top-right */}
+      <div className="absolute top-4 right-4 flex items-center gap-4">
+        {session ? (
+          <>
+            <p className="text-gray-800 text-sm hidden sm:block">Hi, {session.user.name}</p>
+            {session.user.image && (
+              <img
+                src={session.user.image}
+                alt="User"
+                className="w-9 h-9 rounded-full border border-gray-300"
+              />
+            )}
+            <button
+              onClick={() => signOut()}
+              className="px-4 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md text-gray-800"
+            >
+              Sign out
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={() => signIn('google')}
+            className="px-4 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+          >
+            Sign in with Google
+          </button>
+        )}
+      </div>
+
       {isLoading ? (
         <Loader />
       ) : (
         <form
           onSubmit={handleSubmit}
-          className="max-w-md w-full bg-white border border-gray-200 rounded-3xl shadow-md p-8 space-y-6"
+          className="max-w-md mx-auto bg-white border border-gray-200 rounded-3xl shadow-md p-8 space-y-6 mt-20"
           style={{ fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}
         >
           <h1 className="text-4xl font-extrabold text-center text-gray-900 mb-6">
