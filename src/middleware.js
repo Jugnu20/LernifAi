@@ -26,6 +26,6 @@ export const config = {
   matcher: [
     '/',              // protect homepage
     '/learn/:path*',  // protect learning pages
-    '/dashboard',     // optional: protect user dashboard
+    '/dashboard', '/login'     // optional: protect user dashboard
   ],
 };
